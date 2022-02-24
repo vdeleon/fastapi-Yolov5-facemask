@@ -39,10 +39,7 @@ async def home(request: Request):
     <div>
       <label>Select YOLO Model</label>
       <select name="model_name">
-        <option>yolov5s</option>
-        <option>yolov5m</option>
-        <option>yolov5l</option>
-        <option>yolov5x</option>
+        <option>facemask</option>
       </select>
     </div>
   </div>
@@ -63,7 +60,7 @@ async def process_home_form(file: UploadFile = File(...),
     	Each dict contains class, class_name, confidence, normalized_bbox
     '''
 
-    model = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True, force_reload = False)
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='facemask.pt')
 
     #This is how you decode + process image with PIL
     results = model(Image.open(BytesIO(await file.read())))

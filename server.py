@@ -13,7 +13,8 @@ import random
 app = FastAPI()
 templates = Jinja2Templates(directory = 'templates')
 
-model_selection_options = ['yolov5s','yolov5m','yolov5l','yolov5x']
+#model_selection_options = ['yolov5s','yolov5m','yolov5l','yolov5x']
+model_selection_options = ['facemask']
 model_dict = {model_name: None for model_name in model_selection_options} #set up model cache
 
 colors = [tuple([random.randint(0, 255) for _ in range(3)]) for _ in range(100)] #for bbox plotting
@@ -60,7 +61,7 @@ async def detect_via_web_form(request: Request,
 
 	#assume input validated properly if we got here
 	if model_dict[model_name] is None:
-		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True)
+		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', 'custom', path='facemask.pt')
 
 	img_batch = [cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
 					for file in file_list]
@@ -112,7 +113,7 @@ async def detect_via_api(request: Request,
 	'''
 
 	if model_dict[model_name] is None:
-		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True)
+		model_dict[model_name] = torch.hub.load('ultralytics/yolov5', 'custom', path='facemask.pt')
 
 	img_batch = [cv2.imdecode(np.fromstring(await file.read(), np.uint8), cv2.IMREAD_COLOR)
 					for file in file_list]
@@ -188,7 +189,7 @@ if __name__ == '__main__':
 	opt = parser.parse_args()
 
 	if opt.precache_models:
-		model_dict = {model_name: torch.hub.load('ultralytics/yolov5', model_name, pretrained=True) 
+		model_dict = {model_name: torch.hub.load('ultralytics/yolov5', 'custom', path='facemask.pt')
 						for model_name in model_selection_options}
 	
 	app_str = 'server:app' #make the app string equal to whatever the name of this file is
